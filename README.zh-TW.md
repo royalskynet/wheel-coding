@@ -1,4 +1,4 @@
-# wheel-coding
+# wheel-it
 
 > English: [README.md](README.md)
 
@@ -13,7 +13,7 @@
 ## 安裝
 
 ```bash
-npx skills add https://github.com/royalskynet/wheel-coding --skill wheel
+npx skills add https://github.com/royalskynet/wheel-it --skill wheel
 ```
 
 安裝到 `~/.hermes/skills/wheel/`。**開新 session** 才會進索引生效。

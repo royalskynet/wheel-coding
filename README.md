@@ -1,4 +1,4 @@
-# wheel-coding
+# wheel-it
 
 > 繁體中文：[README.zh-TW.md](README.zh-TW.md)
 
@@ -13,7 +13,7 @@ The coding-agent behavior doctrine (pre-work discipline, research-first, stop-lo
 ## Install
 
 ```bash
-npx skills add https://github.com/royalskynet/wheel-coding --skill wheel
+npx skills add https://github.com/royalskynet/wheel-it --skill wheel
 ```
 
 Installs to `~/.hermes/skills/wheel/`. **Start a new session** for it to be indexed.
