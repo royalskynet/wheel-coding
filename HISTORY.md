@@ -58,12 +58,12 @@ SKILL.md 改為六模式路由表（定向／圖譜優先／結構映射／查�
 
 Layer 2 找輪子與查證抽成獨立 `skills/wheel/`（三軸＋深度分級＋授權/活躍檢查＋7 級裁決＋不對稱閘＋registry），概念取自 deja-vu 與 dont-reinvent。coding-hermes 只留指標，刪除 references/research-playbook.md。同一份 wheel 當時也複製進 royalskynet/genie-harness 取代 genie-research（2026-10-18 起改為本 repo 的映射，不再留副本）。
 
-## 2026-10-18 v3.0.0 只留 wheel；coding-hermes 獨立成 ether-code
+## 2026-10-18 v3.0.0 只留 wheel；coding-hermes 獨立成 ether-code；併入 0.4.9
 
 本 repo 的角色收斂為「只放 wheel」。三件事在同一天完成：
 
 1. **只留 wheel。** `coding-hermes` 從本 repo 移除，獨立成 [royalskynet/ether-code](https://github.com/royalskynet/ether-code)；`commands/dispatch.md` 移為 ether-code 的 `skills/coding-hermes/references/dispatch.md`（仍可複製成 `~/.claude/commands/dispatch.md`）。
-2. **併入 genie-harness 版的差異。** 先前 genie-harness 有一份更完整的 wheel（host 專屬的 registry CLI、HN／Stack Overflow／deps.dev 降級鏈、Standard 起社群軸至少兩個來源、採用量欄、`review_by` 30／90／180 天）。這些通用化後併入本 repo；registry CLI 落在 `skills/wheel/scripts/wheel_registry.py`（只依賴標準庫），SKILL.md 保留 `grep`／`printf` 等價退回寫法，並由 `scripts/test_skill.py` 執行原文驗證兩者一致。
+2. **併入 genie-harness 版的差異（含 0.4.9）。** 先前 genie-harness 有一份更完整的 wheel；0.4.9 又加了社群軸不限 closed、讀留言與關閉原因、查未合 PR、社群計票、除錯題先驗元件歸屬，同批併入；更早加入的 host 專屬 registry CLI、HN／Stack Overflow／deps.dev 降級鏈、Standard 起社群軸至少兩個來源、採用量欄、`review_by` 30／90／180 天也在其中。這些通用化後併入本 repo；registry CLI 落在 `skills/wheel/scripts/wheel_registry.py`（只依賴標準庫），SKILL.md 保留 `grep`／`printf` 等價退回寫法，並由 `scripts/test_skill.py` 執行原文驗證兩者一致。
 3. **新增逆向能力。** `/wheel` 明定預設同時做三件事：決策（社群智慧＋官方文檔）、輪子（成熟方案清單）、逆向（閉源產物反推；情境需要或使用者要求才跑）。逆向只到事實與清單（asar、包成員、`otool -L`、`codesign -dv`、strings、sourcemap），借鏡 [rea](https://github.com/royalskynet/rea) 的「依目標路由、先報觀察再推斷、unknown ≠ absence」骨架，不含其 provider 抽象與深層反編譯。
 
 本機收斂：`~/.claude/skills/wheel` 維持指向 `~/.agents/skills/wheel`（genie-harness 安裝的 symlink），`~/.agents/skills/wheel` 改為直接指向本 repo；舊的三份 `coding-hermes` 副本（`~/.agents`、`~/.codex`、`Ether-claude`）刪除，統一指向 `~/dev/ether-code`。
