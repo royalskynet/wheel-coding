@@ -1,6 +1,6 @@
 ---
 name: coding-hermes
-version: 2.4.0
+version: 2.5.0
 author: royalskynet (Ether)
 description: "複雜跨檔開發、陌生程式庫或服務、架構或影響面不明、外部整合、重複失敗時使用：先建立可驗證的系統模型，再選最小實作、查證、驗收與停損。一般局部小修、純配置、純問答或已有更窄專用 workflow 時不使用；全庫技術債審計僅在使用者明確要求時進入。"
 license: MIT
@@ -55,7 +55,7 @@ metadata:
 | 2. 找輪子與查證 | **所有 coding 任務預設觸發**，排在 Layer 1 之後、動手之前（trivial 單行改動／純配置例外，寫「輪子：不適用（原因）」豁免）；同一解法連敗 2 次必觸發 | 跑 `/wheel`（三軸＋輪子卡）；計畫寫一行「輪子：<裁決> <來源>」或「輪子：不適用（原因）」 |
 | 3. 記錄並停手 | 已試 3 種實質不同方案仍失敗 | 記下假設、反例、證據與最小下一步；停止第 4 條盲試，交回決策 |
 
-Layer 2 全文 → [`/wheel` skill](../wheel/SKILL.md)。宿主若定義更嚴格輪次，以宿主為準。
+Layer 2 全文 → [`/wheel` skill](https://github.com/royalskynet/wheel-coding/blob/main/skills/wheel/SKILL.md)。宿主若定義更嚴格輪次，以宿主為準。
 
 ## 停損
 
@@ -115,3 +115,4 @@ fixindex 完整格式、禁則與寫入驗證 → [references/fixindex-usage.md]
 | `references/fixindex-usage.md` | 查舊帳或完工寫入 fixindex |
 | `references/agent-tools.md` | 維護 agent 系統本身 |
 | `references/command-construction.md` | 三條指令案例細節 |
+| `references/dispatch.md` | 派給外部 agent 前檢查工單（＝`/dispatch`，複製到 `~/.claude/commands/dispatch.md`） |

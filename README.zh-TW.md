@@ -4,73 +4,67 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**先找輪子，再動手造。** 兩個可安裝 skill：`wheel`（找現成解法：官方文件、社群共識、成熟 repo → 7 級裁決）與 `coding-hermes`（圍繞它的 coding agent 行為紀律： 動手前紀律、研究優先、膠水思維、架構原則、三層查證紀律、停損兩軸（重試 / 範圍）、fixindex 查寫與寫入驗證、驗收紀律、代理協作紀律。不寫停損次數閾值（見下方宿主分工聲明）。）
+**先找輪子，再動手造。** 這裡只放一個 skill：`wheel` —— 動手前查三軸 prior-art（官方文件／社群共識／成熟開源輪子），出一張輪子卡裁決，並在需要時從閉源產物反推它用了什麼。
 
-**技能類型：** Hermes Agent skill（純文檔紀律，無 runtime 依賴）
+編碼行為紀律（動手前紀律、研究優先、停損、驗收、派工）已獨立到 [royalskynet/ether-code](https://github.com/royalskynet/ether-code)，`coding-hermes` 的 Layer 2 指向本 repo 的 `wheel`。
+
+**技能類型：** 純文檔紀律，無 runtime 依賴；附一個只用標準庫的登記簿 CLI。
 
 ## 安裝
 
 ```bash
-npx skills add https://github.com/royalskynet/wheel-coding --skill coding-hermes
-npx skills add https://github.com/royalskynet/wheel-coding --skill wheel   # Layer 2 找輪子
+npx skills add https://github.com/royalskynet/wheel-coding --skill wheel
 ```
 
-安裝到 `~/.hermes/skills/coding-hermes/`。**開新 session** 才會進索引生效。
+安裝到 `~/.hermes/skills/wheel/`。**開新 session** 才會進索引生效。
+
+## `/wheel` 預設做三件事
+
+| # | 做什麼 | 何時 |
+|---|---|---|
+| 1. 決策 | 官方文檔＋社群共識＋成熟輪子一起收，支持「做／不做／用誰」的 7 級裁決 | 每次 |
+| 2. 輪子 | 成熟方案與開源輪子的清單、採用量、授權、維護狀況，供膠水或採用 | 每次（Quick 只跑這一軸） |
+| 3. 逆向 | 目標是閉源產物（Electron／APK／binary／私有 registry 包）時，從產物反推依賴與設計 | 情境需要或使用者要求，不是每次 |
+
+逆向只到「事實與清單」：列 asar／包成員、`otool -L`、`codesign -dv`、strings、sourcemap。不整份反編譯、不碰 DRM。全量 rea（Ghidra／IDA 深層反編譯）不在本 skill 範圍。
 
 ## 功能
 
-**動手前紀律** — 明說假設，不確定就問；寫最小可解問題的代碼、不寫猜測功能；只改必要的、不順手重構無關部分；先定驗收標準再動手。
-**研究優先（10:7）** — 開發 10 分、研究 7 分：先搜成熟方案、讀官方文件再寫（見三層紀律 Layer 2）。計畫要列 2–3 個候選方案與各一句不用的理由；四路零命中時，列出查過的管道與關鍵字。
-**狀態盤點先於考古** — 接手 / 續作時先盤點**當前實際狀態**（版控狀態、runbook status）。報告是宣稱，狀態是事實；宣告 ≠ 生效：commit ≠ 落盤，完成前必須驗證同步。
+- **重述問題**：先問「不做會怎樣」，能刪就裁決成 `不做`；真問題是別的 → `換題`。
+- **定深度**：Quick／Standard／Full／Full＋逆向，不是每次都全跑。
+- **三軸＋閉源軸**：gh issues、HN、Stack Overflow 做社群共識；`gh search repos`／npm／pip／brew 找輪子；deps.dev＋下載量判龍頭；閉源軸用只讀工具。
+- **評分**：活躍度、授權、成本、可逆性、採用量、社群抱怨；stars 只排序不計分。
+- **7 級裁決**：不做／換題／設定／採用／改用／借鏡／自造，自造是最後一格。
+- **不對稱閘**：自造或帶警示才要第二意見。
+- **輪子卡**：≤12 行，plan 的「輪子：」行就是卡片首行。
+- **登記簿**：每張卡記一行，`review_by` 依領域變化速度（30／90／180 天）過期。
 
-| 層 | 觸發 | 動作 |
-|---|---|---|
-| 1. 動手前查舊帳 | coding 任務開頭 | `fixindex find "<症狀>"` + `session_search`，合併閱讀 |
-| 2. 找輪子與查證 | 自己寫的量超過膠水（新檔案 / 新抽象 / >50 行邏輯）之前；或同一道指令首次失敗之後 | 跑 `wheel` skill：(a) `fixindex find` 回查失敗症狀；再三軸 — **官方文檔**、**社群共識**（`gh search issues "<錯誤>" --state closed`、SO／Reddit）、**成熟輪子**（`gh search repos/code`）→ 輪子卡＋7 級裁決（不做／換題／設定／採用／改用／借鏡／自造），自造是最後一格 |
-| 3. 三條路線失敗後記錄並阻斷 | 已試 3 種不同方案仍失敗 | 用 `fixindex fi` 記錄「未修 + 診斷 + 下一步」，停手求助 |
+## 登記簿
 
-**膠水思維** — 能抄不寫、能連不造、能復用不原創；不發明 → 先搜；只做膠水 → 不造輪子；先結構後代碼；奧卡姆剃刀；可證偽優先（主動找反例）；官方文檔優先；社群回饋備援。
+```bash
+python3 skills/wheel/scripts/wheel_registry.py find "<關鍵字>" "<英文說法>"   # 第 0 步
+python3 skills/wheel/scripts/wheel_registry.py add "設定｜借鏡" "<問題>" "<首選>" 90
+python3 skills/wheel/scripts/wheel_registry.py check
+```
 
-**架構原則** — 不留向下相容；分層成長（最小可運行版本起疊加）；模組化（元件邊界清楚）；為長期做決策。
+五欄 TSV：date、verdict、problem、choice、review_by；檔案在 `~/.wheel/registry.tsv`（可用 `WHEEL_REGISTRY` 覆寫）。純標準庫、無網路。腳本不在時 skill 有 `grep`／`printf` 的等價寫法，`scripts/test_skill.py` 會直接執行那段原文驗證兩邊一致。
 
-**停損兩軸（不要混用）**
-- **重試軸** — 同一個問題還要不要繼續試。錯誤連鎖警戒；同法連續失敗就停止變體嘗試；明寫假設；決定性測試先於探索性嘗試。
-- **範圍軸** — 這個問題該不該現在修。四種結構性成因互相生產彼此（沒有版控、沒有測試、文件與程式碼脫節、靜默失敗）。判準：**影響面 × 是否靜默失敗矩陣**：
+## 測試
 
-|  | 靜默失敗 | 會噴錯 |
-|---|---|---|
-| **影響面大** | ① 最優先 | ② 次之 |
-| **影響面小** | ③ 只記錄，不當場修 | ④ 不用管 |
-
-三條硬性線：一次只推進一層；挖到第二層就停下來寫交接文件、不直接修；新發現超過 5 條就開新文件。使用者說「修不完」時給分類與停損線。
-
-**驗收紀律** — 驗收寬鬆＝靜默失敗（Judge/Guard 類修復時驗收樣本必含一條會紅的判決）；測驗式驗收（重大改動後只問一題、答對即通過）。
-
-**代理協作紀律** — 模型管分類/草稿/摘要、代碼管路由/重試/轉換；模式衝突擇一並標記另一種；加程式前先讀檔案；測試編碼「為何這麼做」；每步完成摘要進度；遵守既有慣例；Fail Loud（不確定 100% 成功就明說，禁默認成功）。
-
-## 宿主分工聲明
-
-本 skill 刻意**不**寫停損次數閾值、反事實閘門、或開工查舊帳的具體入口 —— 那些屬於你的 agent 的**每輪都生效**的全域規則（CLAUDE.md / SOUL.md / system prompt），因為它們必須套用到每一輪，而不只是本 skill 被載入時。若你的宿主什麼都沒定義，本文件各節的質性判準仍可單獨成立。
+```bash
+python3 skills/wheel/scripts/test_wheel_registry.py   # 144 項：文法、過期判定、exit code
+python3 skills/wheel/scripts/test_skill.py            # 30 項：SKILL.md 與 CLI 契約、fallback 可跑
+```
 
 ## 觸發條件
 
-**觸發：** coding、整合、除錯、多步規劃、或連續失敗需要重估的任務。
+**觸發：** 要自造、選型、「該用哪個／有沒有現成／最好的做法／最新版是多少」、新增依賴或子系統、寫超過膠水量的新程式、同一解法連敗 2 次。
 
-**不觸發：** 純問卷、聊天、資料查詢。
+**不觸發：** typo、純改既有程式、概念解釋、已有未過期輪子卡的續做。
 
-## 選用依賴
+## 血緣
 
-[fixindex](https://github.com/royalskynet/fixindex) — bug runbook CLI，症狀→修法查詢。
-
-未安裝時，Layer 1 的 `fixindex find` 段落改以本機記憶 / 搜建工具代替，skill 其餘紀律照樣適用。
-
-## 附帶斜線指令
-
-[`commands/dispatch.md`](commands/dispatch.md) — `/dispatch`：派工前工單客製化檢查（前情自足、可驗證驗收標準、只含必要資訊、步驟詳細、範圍界定、無頭可執行性）。安裝方式：複製到 `~/.claude/commands/dispatch.md`。
-
-## 來源
-
-本 skill 抽出自 [royalskynet/coding-hermes](https://github.com/royalskynet/coding-hermes)（`NousResearch/hermes-agent` 的 fork）的 coding agent 行為紀律，做成獨立可安裝的 skill。沿革詳請見 [HISTORY.md](HISTORY.md)。
+`wheel` 的概念取自 deja-vu（裁決＋不對稱閘）與 dont-reinvent（授權／維護檢查），由 `coding-hermes` 的 Layer 2 於 v2.4.0 抽出成獨立 skill。沿革與各版差異見 [HISTORY.md](HISTORY.md)。
 
 ## License
 
