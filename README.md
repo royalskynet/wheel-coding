@@ -4,73 +4,67 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**Find the wheel before you build it.** Two installable skills: `wheel` (prior-art search: official docs, community consensus, mature repos → a 7-level verdict) and `coding-hermes` (the coding-agent behavior doctrine around it: pre-work discipline, research-first, glue coding, architecture principles, three-layer verification discipline, two stop-loss axes (retry / scope), fixindex read & write verification, acceptance discipline, and agent collaboration rules. No numeric stop-loss thresholds (see the host-division note below).)
+**Find the wheel before you build it.** One skill lives here: `wheel` — prior-art search before building (official docs / community consensus / mature open-source repos → a wheel card with a 7-level verdict), plus an optional reverse pass that reads what a shipped, closed-source artifact actually depends on.
 
-**Skill type:** Hermes Agent skill（純文檔紀律，無 runtime 依賴）
+The coding-agent behavior doctrine (pre-work discipline, research-first, stop-loss, acceptance, dispatch) now lives in [royalskynet/ether-code](https://github.com/royalskynet/ether-code); its `coding-hermes` Layer 2 points back at this repo's `wheel`.
+
+**Skill type:** doc-only discipline, no runtime dependency; ships one standard-library registry CLI.
 
 ## Install
 
 ```bash
-npx skills add https://github.com/royalskynet/wheel-coding --skill coding-hermes
-npx skills add https://github.com/royalskynet/wheel-coding --skill wheel   # Layer 2 prior-art
+npx skills add https://github.com/royalskynet/wheel-coding --skill wheel
 ```
 
-Installs to `~/.hermes/skills/coding-hermes/`. **Start a new session** for it to be indexed.
+Installs to `~/.hermes/skills/wheel/`. **Start a new session** for it to be indexed.
+
+## `/wheel` does three things by default
+
+| # | Job | When |
+|---|---|---|
+| 1. Decision | official docs + community consensus + mature repos feed a 7-level verdict (build / don't / which one) | every time |
+| 2. Wheels | inventory of mature options: adoption, license, maintenance, for glue or adoption | every time (Quick runs only this lane) |
+| 3. Reverse | target is closed-source (Electron / APK / binary / private-registry package) → infer its dependencies and design from the artifact | when the context needs it or the user asks, not every time |
+
+The reverse pass stops at facts and inventory: asar/package listings, `otool -L`, `codesign -dv`, strings, sourcemaps. No whole-binary decompilation, no DRM. Full REA (Ghidra/IDA deep decompilation) is out of scope.
 
 ## What it does
 
-**Pre-work discipline** — state your assumptions, ask when uncertain; write minimally solvable code, no speculative features; change only what's necessary; define acceptance before coding.
-**Research-first (10:7)** — spend ~10 units developing to 7 units researching: search proven approaches and read official docs before writing (Layer 2 of the three-layer discipline). List 2–3 candidate approaches with one-line reasons against; on a four-path miss, list the channels and keywords you searched.
-**State-audit before archaeology** — on handoff / continuation, first audit the *current* state (VCS status, runbook status). Reports are claims; status is fact. Declaration ≠ effect: commit ≠ persisted; verify sync before claiming done.
+- **Restate** — "what if we did nothing?" can end at `不做`; a different real problem ends at `換題`.
+- **Depth** — Quick / Standard / Full / Full+reverse; not everything runs every time.
+- **Three lanes + a closed-source lane** — gh issues, HN, Stack Overflow for community consensus; `gh search repos` / npm / pip / brew for wheels; deps.dev + download counts to pick the leader; read-only commands for the closed-source lane.
+- **Scoring** — activity, license, cost, reversibility, adoption, recurring complaints; stars sort candidates, they do not score them.
+- **7-level verdict** — 不做 / 換題 / 設定 / 採用 / 改用 / 借鏡 / 自造; building is the last rung.
+- **Asymmetric gate** — a second opinion only for `自造` or a warned adoption.
+- **Wheel card** — ≤12 lines; the `輪子：` line of a plan is its first line.
+- **Registry** — one row per card; `review_by` expires by domain speed (30 / 90 / 180 days).
 
-| Layer | Trigger | Action |
-|---|---|---|
-| 1. Open-time lookup | coding task start | `fixindex find \"<symptom>\"` + `session_search`, merge results |
-| 2. On-failure re-query | before your own code exceeds glue (new file / abstraction / >50-line logic), or first failure of a command | Run the `wheel` skill: (a) `fixindex find` with failure symptom; then three lanes — **official docs**, **community consensus** (`gh search issues "<error>" --state closed`, SO/Reddit), **mature repos** (`gh search repos/code`) → a wheel card with a 7-level verdict (skip / reframe / configure / adopt / fork / borrow / build). Build is the last rung |
-| 3. Record-and-block after 3 approaches | 3 different approaches failed | Record with `fixindex fi` (unfixed + diagnosis + next step) | stop and ask for help |
+## Registry
 
-**Glue coding** — don't invent, glue: no reinvention; stub first then code; Occam's razor; falsifiable-first (seek counterexamples); official docs first; community fallback.
+```bash
+python3 skills/wheel/scripts/wheel_registry.py find "<keyword>" "<English term>"   # step 0
+python3 skills/wheel/scripts/wheel_registry.py add "設定｜借鏡" "<problem>" "<choice>" 90
+python3 skills/wheel/scripts/wheel_registry.py check
+```
 
-**Architecture principles** — no backward-compat layers; layered growth from a minimal runnable base; modularization; decisions for the long term.
+Five-column TSV: date, verdict, problem, choice, review_by; stored in `~/.wheel/registry.tsv` (`WHEEL_REGISTRY` overrides). Standard library only, no network. When the script is absent the skill has equivalent `grep`/`printf` fallbacks, and `scripts/test_skill.py` executes that prose verbatim to keep the two in agreement.
 
-**Stop-loss: two axes, not interchangeable**
-- **Retry axis** — whether to keep trying the same question. Error-cascade warning; stop symbol variants of the same solution; explicit assumptions; deterministic test before exploratory attempts.
-- **Scope axis** — whether this problem needs fixing now. Four structural causes feed each other (untracked state, no tests, doc-code drift, silent failure). Judgment: **impact × silent-failure matrix**:
+## Tests
 
-|  | Silent failure | Loud error |
-|---|---|---|
-| **Large impact** | ① highest priority | ② next |
-| **Small impact** | ③ record, don't fix now | ④ ignore |
-
-Three hard lines: advance one layer at a time; stop at the third layer and write a handoff file instead of fixing; open a new document past 5 findings.
-
-**Acceptance discipline** — loose acceptance is silent failure (judge/guard tests must include a verdict sample that turns red); quiz-based acceptance (one question after major changes).
-
-**Agent collaboration rules** — judgment calls only for models, code handles routing/retry; surface conflicts rather than mix; read before writing; tests verify intent; checkpoints; convention beats novelty; fail loud.
-
-## Host-division note
-
-This skill deliberately does **not** define numeric stop-loss thresholds, the counterfactual gate, or the concrete lookup entry point — those belong in your agent's always-on global rules (CLAUDE.md / SOUL.md / system prompt), because they must apply to every turn, not only when this skill is loaded. If your host defines none, the qualitative criteria in each section stand on their own.
+```bash
+python3 skills/wheel/scripts/test_wheel_registry.py   # 144 checks: grammar, expiry, exit codes
+python3 skills/wheel/scripts/test_skill.py            # 30 checks: SKILL.md ↔ CLI contract, fallbacks run
+```
 
 ## When it triggers / doesn't
 
-**Triggers:** coding, integration, debugging, multi-step planning, or any task with repeated failures needing re-evaluation.
+**Triggers:** about to build, choosing a tool, "is there an existing/standard way", "what's the latest version", adding a dependency or subsystem, writing more than glue, or two failed attempts at the same approach.
 
-**Does not trigger:** pure Q&A, casual chat, data lookup.
-
-## Optional dependency
-
-[fixindex](https://github.com/royalskynet/fixindex) — bug runbook CLI for symptom→fix lookup.
-
-If not installed, Layer 1's `fixindex find` step falls back to local memory / search tools. All other discipline rules still apply.
-
-## Bundled slash command
-
-[`commands/dispatch.md`](commands/dispatch.md) — `/dispatch`: pre-dispatch work-order customization check (self-sufficient context, verifiable acceptance criteria, necessary-info-only, detailed steps, out-of-scope list, headless executability). Written in Traditional Chinese. Install by copying to `~/.claude/commands/dispatch.md`.
+**Does not trigger:** typos, editing existing code, concept explanations, continuing a fresh wheel card.
 
 ## Origin
 
-This skill packages the coding-agent behavior doctrine from [royalskynet/coding-hermes](https://github.com/royalskynet/coding-hermes) (a fork of NousResearch/hermes-agent) into a standalone installable skill. See [HISTORY.md](HISTORY.md) for the full lineage.
+`wheel` merges the design ideas of deja-vu (verdicts + asymmetric gate) with dont-reinvent (license / maintenance checks); Layer 2 of `coding-hermes` was extracted into this standalone skill in v2.4.0. See [HISTORY.md](HISTORY.md) for versions.
 
 ## License
 
